@@ -40,3 +40,8 @@ python benchmark.py http://localhost:8000/api/posts/naive --requests 50
 - The seeded dataset contains 20 authors, 200 posts, and 2000 comments.
 - The measured benchmark on the seeded dataset reduced the naive endpoint from 401 queries to 1 query on both optimized endpoints.
 - Sample benchmark timings on the local SQLite-backed dev run were approximately 248.864 ms average for `/api/posts/naive`, 24.718 ms for `/api/posts/optimized`, and 28.288 ms for `/api/posts/advanced`.
+
+
+## Video Demo link
+
+https://youtu.be/I0c0SRub5Yw
