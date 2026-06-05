@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: blogdb
+      POSTGRES_USER: blog
+      POSTGRES_PASSWORD: blog
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blog -d blogdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DEBUG: "1"
+      SECRET_KEY: "docker-secret-key"
+      ALLOWED_HOSTS: "*"
+      DATABASE_URL: "postgresql://blog:blog@db:5432/blogdb"
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "until python manage.py migrate --noinput; do echo 'Waiting for database...'; sleep 2; done && python manage.py seed_db && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz').read()\""]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  postgres_data:
